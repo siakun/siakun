@@ -30,6 +30,10 @@
   <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=siakun&theme=github_dark" />
 </p>
 
+<p align="center">
+  <img src="./github-metrics.svg" alt="GitHub Metrics" />
+</p>
+
 ---
 
 ## 📫 연락처
