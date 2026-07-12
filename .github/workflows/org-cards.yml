@@ -1,0 +1,39 @@
+name: Org cards
+on:
+  # 매일 00:30 UTC (metrics와 30분 오프셋, 동시 push 충돌 방지)
+  schedule: [{ cron: "30 0 * * *" }]
+  # Actions 탭에서 수동 실행
+  workflow_dispatch:
+  # 생성기/워크플로 변경 시 갱신 (생성물 org-*.svg는 paths에 없어 자기 재트리거 없음)
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/gen-org-cards.sh"
+      - ".github/workflows/org-cards.yml"
+
+jobs:
+  org-cards:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # METRICS_TOKEN으로 조직의 공개/비공개 리포 수를 읽어 카드 SVG를 재생성
+      - name: Generate org cards
+        env:
+          GH_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: bash scripts/gen-org-cards.sh
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- 'org-*.svg'; then
+            echo "no changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add org-*.svg
+          git commit -m "Update org cards - [Skip GitHub Action]"
+          git pull --rebase origin main
+          git push
