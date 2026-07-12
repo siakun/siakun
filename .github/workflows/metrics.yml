@@ -1,10 +1,10 @@
 name: Metrics
 on:
-  # 매일 00:00 UTC(한국 09:00)에 갱신
+  # 매일 00:00 UTC(한국 09:00) 갱신
   schedule: [{ cron: "0 0 * * *" }]
-  # Actions 탭에서 수동 실행 가능
+  # Actions 탭에서 수동 실행
   workflow_dispatch:
-  # main 브랜치 push 시에도 갱신
+  # main push 시 갱신
   push: { branches: ["main"] }
 
 jobs:
@@ -13,36 +13,46 @@ jobs:
     permissions:
       contents: write
     steps:
+      # 구성/필터 정책과 근거는 저장소 루트 PROJECT.md 참고
       - uses: lowlighter/metrics@latest
         with:
-          # Settings > Secrets 에 등록한 PAT
+          # Settings > Secrets에 등록한 PAT
           token: ${{ secrets.METRICS_TOKEN }}
 
-          # 생성될 파일명 (README에서 이 파일을 참조)
+          # 생성 파일명 (README에서 참조)
           filename: github-metrics.svg
 
-          # 기본 통계 (헤더, 활동, 커뮤니티, 리포지토리)
-          base: header, activity, community, repositories
+          # 헤더만 유지 (약점 지표 섹션 제외, 강점은 아래 플러그인으로)
+          base: header
           config_timezone: Asia/Seoul
-          # fork한 리포는 언어/통계에서 제외 (남의 코드가 섞이지 않게)
+          # fork 리포는 통계에서 제외
           repositories_forks: no
+
+          # 입체 커밋 캘린더 (꾸준한 실행력 시각화)
+          plugin_isocalendar: yes
+          # half-year: 잔디가 작게 가로로 깔리고 스트릭/커밋 통계가 오른쪽에 붙는 컴팩트 레이아웃
+          plugin_isocalendar_duration: half-year
+
+          # 코드 작성량
+          plugin_lines: yes
 
           # 사용 언어 분포
           plugin_languages: yes
-          # linguist 기반 언어 바이트 집계 (생성/벤더 파일 자동 제외)
-          # indepth는 author 커밋 샘플만 세어 단일 언어로 왜곡되므로 사용 안 함
+          # indepth는 단일 언어로 왜곡되므로 미사용
           plugin_languages_indepth: no
-          # 언어 이름 옆에 바이트 크기와 비율을 텍스트로 표시
+          # 언어 옆에 바이트/비율 표시
           plugin_languages_details: bytes-size, percentage
+          # 프로그래밍/마크업 언어만
           plugin_languages_categories: markup, programming
-          # 노트북 바이트 폭증 제외
-          plugin_languages_ignored: jupyter-notebook
-          # 1% 미만 자투리 언어(데이터/오탐) 숨김
+          # 1% 미만 언어 숨김
           plugin_languages_threshold: 1%
+          # 상위 8개만 표시
           plugin_languages_limit: 8
-          # 언어 통계에서만 제외할 스크래치/테스트/봇/데이터 리포
-          # (기본 통계인 커밋/리포지토리 수는 그대로 유지됨)
+          # 언어 통계 제외 목록. @use.patterns는 첫 줄 필수, 블록 안엔 패턴만.
           plugin_languages_skipped: |-
+            @use.patterns
+            siakun-private/*
+            siakun-forks/*
             bit-flo/*
             siakun/notedrop-share
             siakun/LetterAI
