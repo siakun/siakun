@@ -29,8 +29,8 @@ jobs:
           repositories_forks: no
 
           # 입체 커밋 캘린더 (꾸준한 실행력 시각화)
-          plugin_isocalendar: yes
           # half-year: 잔디가 작게 가로로 깔리고 스트릭/커밋 통계가 오른쪽에 붙는 컴팩트 레이아웃
+          plugin_isocalendar: yes
           plugin_isocalendar_duration: half-year
 
           # 코드 작성량
