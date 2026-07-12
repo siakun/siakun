@@ -8,10 +8,22 @@
 |------|------|-----------|
 | `README.md` | 프로필 대문 | 직접 편집 (방문자 대상이라 존댓말 유지) |
 | `github-metrics.svg` | GitHub 활동 요약 이미지 | `lowlighter/metrics`가 CI에서 자동 생성 |
-| `org-private.svg` 외 `org-*.svg` 4개 | 조직별 북마크 카드 | 직접 생성한 SVG (다크/라이트 테마 대응) |
+| `org-private.svg` 외 `org-*.svg` 4개 | 조직별 북마크 카드 | `scripts/gen-org-cards.sh`가 CI에서 자동 생성 |
+| `scripts/gen-org-cards.sh` | 조직 카드 생성기 | 직접 편집 |
 | `.github/workflows/metrics.yml` | metrics 자동 생성 워크플로 | 직접 편집 |
+| `.github/workflows/org-cards.yml` | 조직 카드 자동 갱신 워크플로 | 직접 편집 |
+| `.gitattributes` | `*.sh` LF 고정 (CRLF 체크아웃 시 bash 깨짐 방지) | 직접 편집 |
 
-`org-*.svg`는 조직 아바타를 base64로 내장한 정적 SVG로, 조직당 1파일이다. `@media (prefers-color-scheme: dark)`로 라이트/다크 팔레트를 함께 넣어, 방문자 테마에 따라 자동으로 바뀐다. `<img>` 임베드에서는 SVG 내부 링크가 동작하지 않으므로, 카드를 조직당 1파일로 분리하고 README에서 각 `<img>`를 `<a href>`로 감싸 클릭 이동을 구현한다. 카드 하단에 투명 여백 8px를 넣어 세로 스택 시 카드 간격이 생기게 했다.
+`org-*.svg`는 조직 아바타를 base64로 내장한 SVG로, 조직당 1파일이다. `@media (prefers-color-scheme: dark)`로 라이트/다크 팔레트를 함께 넣어, 방문자 테마에 따라 자동으로 바뀐다. `<img>` 임베드에서는 SVG 내부 링크가 동작하지 않으므로, 카드를 조직당 1파일로 분리하고 README에서 각 `<img>`를 `<a href>`로 감싸 클릭 이동을 구현한다. 카드 하단에 투명 여백 8px를 넣어 세로 스택 시 카드 간격이 생기게 했다.
+
+### 조직 카드 자동 갱신 (org-cards.yml)
+
+- `scripts/gen-org-cards.sh`가 `GET /orgs/{org}`에서 공개/비공개 리포 수를 읽어 카드 우하단에 "공개 N / 비공개 M"으로 표시한다.
+- **비공개 수(`total_private_repos`)는 조직 소유자 권한 토큰으로 호출해야 응답에 포함된다.** CI에서는 `METRICS_TOKEN`을 `GH_TOKEN`으로 넘긴다. 토큰이 없으면 공개 수만 표시하는 fallback이 있다.
+- 스케줄은 매일 00:30 UTC로, metrics(00:00 UTC)와 30분 오프셋을 둬 자동 커밋 push 충돌을 피한다.
+- push 트리거는 `paths`로 생성기/워크플로 파일에 한정한다. 생성물(`org-*.svg`)은 paths에 없으므로 자기 커밋으로 재트리거되지 않는다.
+- 로컬 실행: `GH_TOKEN=$(gh auth token) bash scripts/gen-org-cards.sh` (gh CLI 로그인 계정이 조직 소유자면 비공개 수까지 나온다.)
+- 이 워크플로도 metrics처럼 `org-*.svg`를 자동 커밋하므로, 로컬과 origin이 발산하는 자동 커밋 소스가 하나 더 늘어난다. push 전 `git pull --rebase` 습관은 동일하게 적용한다.
 
 ## 2. metrics 구성 개요 (metrics.yml)
 
