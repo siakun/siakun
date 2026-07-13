@@ -4,7 +4,9 @@
 # - 비공개 수(total_private_repos)는 조직 접근 권한이 있는 토큰(GH_TOKEN)이 있어야 나온다.
 #   토큰이 없으면 공개 수만 표시한다.
 # - 아바타는 base64로 SVG에 내장한다(외부 이미지는 <img> 임베드에서 로드되지 않음).
-# - 라이트 팔레트 기본 + @media(prefers-color-scheme: dark) 오버라이드.
+# - 팔레트는 테마 중립 단일 팔레트다. Safari(WebKit)가 <img> SVG의 미디어 쿼리를
+#   지원하지 않아 @media(prefers-color-scheme) 2팔레트는 iOS에서 무작위로 깨진다.
+#   모든 색은 라이트(#ffffff)/다크(#0d1117) 페이지 배경 양쪽에서 읽혀야 한다.
 # 설계 배경과 정책은 저장소 루트 PROJECT.md 참고.
 set -euo pipefail
 
@@ -67,13 +69,12 @@ emit_card() { # $1=org, $2=desc, $3=counts
   cat <<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$TW" height="$H" viewBox="0 0 $TW $H" fill="none">
 <style>
-.name{font:700 15px $FONT;fill:#24292e}
-.desc{font:400 13px $FONT;fill:#586069}
+.name{font:700 15px $FONT;fill:#4493f8}
+.desc{font:400 13px $FONT;fill:#7d8590}
 .url{font:400 12px $FONT;fill:#8b949e}
 .count{font:400 11px $FONT;fill:#8b949e}
 .gh{fill:#8b949e}
-.card{fill:#ffffff;fill-opacity:0.55;stroke:#d0d7de;stroke-opacity:1;stroke-width:1}
-@media(prefers-color-scheme:dark){.name{fill:#e6edf3}.desc{fill:#adbac7}.url{fill:#8b949e}.count{fill:#8b949e}.gh{fill:#8b949e}.card{fill:#ffffff;fill-opacity:0.08;stroke:#ffffff;stroke-opacity:0.15}}
+.card{fill:#8b949e;fill-opacity:0.07;stroke:#8b949e;stroke-opacity:0.4;stroke-width:1}
 </style>
 <defs><clipPath id="clip"><rect x="294" y="10" width="56" height="56" rx="14" ry="14"/></clipPath></defs>
 <g transform="translate($PADL 0)">
@@ -100,10 +101,9 @@ emit_header() {
   cat <<SVG
 <svg xmlns="http://www.w3.org/2000/svg" width="$((W+20))" height="$H" viewBox="0 0 $((W+20)) $H" fill="none">
 <style>
-.h2{font:600 20px $FONT;fill:#24292e}
-.cap{font:400 12px $FONT;fill:#586069}
-.rule{fill:#d0d7de}
-@media(prefers-color-scheme:dark){.h2{fill:#e6edf3}.cap{fill:#adbac7}.rule{fill:#3d444d}}
+.h2{font:600 20px $FONT;fill:#848d97}
+.cap{font:400 12px $FONT;fill:#7d8590}
+.rule{fill:#8b949e;fill-opacity:0.4}
 </style>
 <g transform="translate($PADL 0)">
 <text class="h2" x="0" y="22">🗂️ 다른 공간의 저장소들</text>
