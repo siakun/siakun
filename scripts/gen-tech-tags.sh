@@ -28,6 +28,14 @@ tags=(
   "TypeScript|typescript|$DEVICON/typescript/typescript-plain.svg"
   "PostgreSQL|postgresql|$DEVICON/postgresql/postgresql-plain.svg"
   "Docker|docker|$DEVICON/docker/docker-plain.svg"
+  "Git|git|$DEVICON/git/git-plain.svg"
+  "GitHub|github|$DEVICON/github/github-original.svg"
+  "Visual Studio|visualstudio|$DEVICON/visualstudio/visualstudio-plain.svg"
+  "VS Code|vscode|$DEVICON/vscode/vscode-plain.svg"
+  "JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
+  "Next.js|nextjs|$DEVICON/nextjs/nextjs-plain.svg"
+  "React|react|$DEVICON/react/react-original.svg"
+  "Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
 )
 
 # ---- 디자인 상수 -----------------------------------------------------------
