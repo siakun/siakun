@@ -31,10 +31,12 @@
 <img src="./images/tag-typescript.svg" alt="TypeScript" />
 <img src="./images/tag-postgresql.svg" alt="PostgreSQL" />
 <img src="./images/tag-docker.svg" alt="Docker" />
+<img src="./images/tag-synology.svg" alt="Synology" />
 <img src="./images/tag-git.svg" alt="Git" />
 <img src="./images/tag-github.svg" alt="GitHub" />
 <img src="./images/tag-visualstudio.svg" alt="Visual Studio" />
 <img src="./images/tag-vscode.svg" alt="VS Code" />
+<img src="./images/tag-notion.svg" alt="Notion" />
 <img src="./images/tag-javascript.svg" alt="JavaScript" />
 <img src="./images/tag-nextjs.svg" alt="Next.js" />
 <img src="./images/tag-react.svg" alt="React" />

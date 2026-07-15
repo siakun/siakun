@@ -28,10 +28,12 @@ tags=(
   "TypeScript|typescript|$DEVICON/typescript/typescript-plain.svg"
   "PostgreSQL|postgresql|$DEVICON/postgresql/postgresql-plain.svg"
   "Docker|docker|$DEVICON/docker/docker-plain.svg"
+  "Synology|synology"  # 공식 로고가 워드마크뿐이라 직접 그린 NAS 픽토그램을 쓴다 (icons/synology.svg, 자체 제작)
   "Git|git|$DEVICON/git/git-plain.svg"
   "GitHub|github|$DEVICON/github/github-original.svg"
   "Visual Studio|visualstudio|$DEVICON/visualstudio/visualstudio-plain.svg"
   "VS Code|vscode|$DEVICON/vscode/vscode-plain.svg"
+  "Notion|notion|$DEVICON/notion/notion-plain.svg"
   "JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
   "Next.js|nextjs|$DEVICON/nextjs/nextjs-plain.svg"
   "React|react|$DEVICON/react/react-original.svg"
@@ -193,10 +195,12 @@ inline_icon() { # $1=slug
   fi
 
   # 내부 paint 정규화: none은 보존하고(투명 영역 유지) 나머지 색만 INK로 치환한다.
+  # 일반 치환의 값 패턴은 ~로 시작하지 않는 값만 잡는다. [^"]*로 잡으면
+  # 보호 마커(~NONE~)까지 다시 매칭되어 none 보존이 무력화되기 때문이다.
   inner=$(printf '%s' "$inner" | sed -E '
     s/(fill|stroke)="[Nn][Oo][Nn][Ee]"/\1="~NONE~"/g
-    s/fill="[^"]*"/fill="'"$INK"'"/g
-    s/stroke="[^"]*"/stroke="'"$INK"'"/g
+    s/fill="[^~"][^"]*"/fill="'"$INK"'"/g
+    s/stroke="[^~"][^"]*"/stroke="'"$INK"'"/g
     s/(fill|stroke)="~NONE~"/\1="none"/g')
 
   # viewBox(min-x min-y w h) -> 14x14 영역에 균일 스케일 + 중앙 정렬
