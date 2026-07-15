@@ -95,9 +95,14 @@ label_w_px() { # 표시 이름 -> 폭(px, 반올림 정수)
 # 통과 조건: 문서 루트가 <svg>, viewBox 4값 유효(w/h 양수), 외부 참조 없음,
 #            <style>/class/인라인 style 없음, none 제외한 paint 색이 1가지 이하.
 # 실패 시 이유를 출력하고 1을 반환한다.
+# 아이콘 XML을 한 줄로 평탄화한다. CR은 공백이 아니라 삭제해야 한다.
+# 공백으로 바꾸면 같은 파일이라도 체크아웃 줄바꿈 상태(LF/CRLF)에 따라
+# 출력 공백 수가 달라져 재생성 멱등성이 깨진다 (autocrlf 재체크아웃에서 실측).
+xml_flat() { tr -d '\r' < "$1" | tr '\n\t' '  '; }
+
 validate_icon() { # $1=파일
   local flat s vb colors ncolors
-  flat=$(tr '\n\r\t' '   ' < "$1")
+  flat=$(xml_flat "$1")
 
   # 문서 루트 판정: XML 선언/DOCTYPE/주석을 걷어낸 첫 요소가 <svg>여야 한다.
   # "<svg 문자열 포함" 검사는 SVG가 박힌 HTML 페이지도 통과하므로 문서 단위로 본다.
@@ -164,7 +169,7 @@ fetch_icon() { # $1=slug, $2=url -> $ICON_DIR/<slug>.svg
 inline_icon() { # $1=slug
   local file="$ICON_DIR/$1.svg" flat roottag inner root_fill root_stroke g_paint
   local vb minx miny vbw vbh tx ty sc
-  flat=$(tr '\n\r\t' '   ' < "$file")
+  flat=$(xml_flat "$file")
   roottag=$(printf '%s' "$flat" | grep -oE '<svg[^>]*>' | head -1)
   inner="${flat#*"$roottag"}"
   inner="${inner%</svg>*}"
@@ -295,10 +300,15 @@ done
 shopt -u nullglob
 
 # ---- 6) README 마커 구간 재생성 ---------------------------------------------
+# img들을 <div>로 감싼다. 최상위에 img 줄을 나열하면 GitHub 렌더러가 줄마다
+# 별도 <p> 문단으로 분리해 태그가 세로로 쌓인다. <div>가 HTML 블록을 열면
+# 내용이 원시 HTML로 통과돼 인라인으로 흐른다 (GitHub markdown API로 검증).
 block=$(mktemp)
+printf '<div>\n' > "$block"
 for i in "${!names[@]}"; do
   printf '<img src="./%s/%s" alt="%s" />\n' "$OUT_DIR" "${outs[$i]}" "${names[$i]}" >> "$block"
 done
+printf '</div>\n' >> "$block"
 tmp_readme=$(mktemp)
 awk -v s="$MARK_S" -v e="$MARK_E" -v blockfile="$block" '
   { sub(/\r$/, "") }
