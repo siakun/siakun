@@ -16,21 +16,21 @@
   <a href="https://github.com/siakun-forks"><img src="./org-forks.svg" alt="siakun-forks" align="left" /></a>
 </div>
 
-<br clear="both" />
+<br clear="both" /><br/>
 
-<!--
-## 🛠️ 주요 기술
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=cs,dotnet,unity,ts,py,postgres,docker,git,github,visualstudio,vscode" />
-</p>
-
-## 🌱 학습 중
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=react,nextjs,nodejs" />
-</p>
--->
+<!-- 기술 태그: scripts/gen-tech-tags.sh가 아래 구간을 생성한다. 손으로 편집하지 않는다.
+     <br clear> 뒤라 위 플로트 레이아웃과 간섭이 없고, 뒤에 붙인 <br/>이
+     위 섹션과의 세로 간격(빈 줄 하나)을 만든다. -->
+<!-- tech-tags:start -->
+<img src="./tag-csharp.svg" alt="C#" />
+<img src="./tag-cplusplus.svg" alt="C/C++" />
+<img src="./tag-dotnet.svg" alt=".NET" />
+<img src="./tag-unity.svg" alt="Unity" />
+<img src="./tag-python.svg" alt="Python" />
+<img src="./tag-typescript.svg" alt="TypeScript" />
+<img src="./tag-postgresql.svg" alt="PostgreSQL" />
+<img src="./tag-docker.svg" alt="Docker" />
+<!-- tech-tags:end -->
 
 <!--
 ## 📫 연락처
