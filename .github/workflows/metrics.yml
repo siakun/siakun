@@ -19,8 +19,8 @@ jobs:
           # Settings > Secrets에 등록한 PAT
           token: ${{ secrets.METRICS_TOKEN }}
 
-          # 생성 파일명 (README에서 참조)
-          filename: github-metrics.svg
+          # 생성 파일 경로 (README에서 참조)
+          filename: images/github-metrics.svg
 
           # 헤더만 유지 (약점 지표 섹션 제외, 강점은 아래 플러그인으로)
           base: header

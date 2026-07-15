@@ -4,7 +4,7 @@ on:
   schedule: [{ cron: "30 0 * * *" }]
   # Actions 탭에서 수동 실행
   workflow_dispatch:
-  # 생성기/워크플로 변경 시 갱신 (생성물 org-*.svg는 paths에 없어 자기 재트리거 없음)
+  # 생성기/워크플로 변경 시 갱신 (생성물 images/org-*.svg는 paths에 없어 자기 재트리거 없음)
   push:
     branches: ["main"]
     paths:
@@ -27,13 +27,13 @@ jobs:
 
       - name: Commit if changed
         run: |
-          if git diff --quiet -- 'org-*.svg'; then
+          if git diff --quiet -- 'images/org-*.svg'; then
             echo "no changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add org-*.svg
+          git add 'images/org-*.svg'
           git commit -m "Update org cards - [Skip GitHub Action]"
           git pull --rebase origin main
           git push

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# 기술 태그 SVG(tag-*.svg) 생성기 + README 동기화.
+# 기술 태그 SVG(images/tag-*.svg) 생성기 + README 동기화.
 # - 아래 tags 배열이 단일 소스다. 태그 변경 = 배열 수정 + 이 스크립트 실행으로 끝난다.
-# - 아이콘은 icons/<slug>.svg 캐시에서 읽고, 없으면 소스 URL에서 1회 내려받아 검증 후 저장한다.
+# - 아이콘은 images/icons/<slug>.svg 캐시에서 읽고, 없으면 소스 URL에서 1회 내려받아 검증 후 저장한다.
 # - 아이콘 벡터를 태그 SVG 안에 인라인한다(<img> 임베드 SVG는 외부 리소스를 못 불러온다).
 # - README.md의 tech-tags 마커 구간을 재생성하고, 배열에 없는 tag-*.svg는 삭제한다.
 # - 팔레트는 org 카드와 동일한 테마 중립 모노톤이다(Safari <img> SVG 미디어 쿼리 미지원).
@@ -14,8 +14,8 @@ cd "$(dirname "$0")/.."
 # ---- 태그 선언 (단일 소스) ------------------------------------------------
 # 형식: "표시이름|slug|소스URL" (1~3필드)
 #   1필드: 아이콘 없는 텍스트 필
-#   2필드: icons/<slug>.svg가 이미 있어야 한다 (직접 넣은 아이콘)
-#   3필드: 캐시에 없으면 URL에서 받아 icons/<slug>.svg로 저장한다
+#   2필드: images/icons/<slug>.svg가 이미 있어야 한다 (직접 넣은 아이콘)
+#   3필드: 캐시에 없으면 URL에서 받아 images/icons/<slug>.svg로 저장한다
 # 제약: 표시이름은 ASCII(영숫자, # + . / - 공백)만, slug는 ^[a-z0-9][a-z0-9-]*$.
 #       URL이 있으면 slug 필수. 다색/스타일 기반/외부 참조 아이콘은 검증에서 거부된다.
 DEVICON="https://raw.githubusercontent.com/devicons/devicon/master/icons"
@@ -45,6 +45,8 @@ MB=6            # 캔버스 하단 투명 여백 (줄바꿈 시 세로 간격)
 H=$((PH + MB))  # 캔버스 높이
 BASELINE="16.3" # 12px 글자를 필 세로 중앙에 놓는 baseline (목업 실측으로 보정)
 
+OUT_DIR="images"        # 태그 SVG 산출물 폴더
+ICON_DIR="images/icons" # 아이콘 원본 캐시 폴더
 README="README.md"
 MARK_S='<!-- tech-tags:start -->'
 MARK_E='<!-- tech-tags:end -->'
@@ -145,22 +147,22 @@ validate_icon() { # $1=파일
   return 0
 }
 
-fetch_icon() { # $1=slug, $2=url -> icons/<slug>.svg
+fetch_icon() { # $1=slug, $2=url -> $ICON_DIR/<slug>.svg
   local slug="$1" url="$2" tmp reason
-  tmp="icons/.download-$slug.$$"
+  tmp="$ICON_DIR/.download-$slug.$$"
   curl -sfL --max-time 30 -o "$tmp" "$url" || { rm -f "$tmp"; die "다운로드 실패: $url"; }
   if ! reason=$(validate_icon "$tmp"); then
     rm -f "$tmp"
     die "받은 아이콘이 유효하지 않다($slug): $reason ($url)"
   fi
-  mv "$tmp" "icons/$slug.svg"   # 같은 디렉터리 안 이동이라 반쯤 쓴 파일이 남지 않는다
-  echo "fetched: icons/$slug.svg"
+  mv "$tmp" "$ICON_DIR/$slug.svg"   # 같은 디렉터리 안 이동이라 반쯤 쓴 파일이 남지 않는다
+  echo "fetched: $ICON_DIR/$slug.svg"
 }
 
 # ---- 아이콘 인라인 (paint 정규화 + viewBox 변환) ----------------------------
 # stdout: 태그 SVG에 넣을 <g ...>...</g> 조각
 inline_icon() { # $1=slug
-  local file="icons/$1.svg" flat roottag inner root_fill root_stroke g_paint
+  local file="$ICON_DIR/$1.svg" flat roottag inner root_fill root_stroke g_paint
   local vb minx miny vbw vbh tx ty sc
   flat=$(tr '\n\r\t' '   ' < "$file")
   roottag=$(printf '%s' "$flat" | grep -oE '<svg[^>]*>' | head -1)
@@ -252,41 +254,41 @@ end_ln=$(awk -v m="$MARK_E" '{ sub(/\r$/, "") } $0 == m { print NR }' "$README")
 [ "$start_ln" -lt "$end_ln" ] || die "README 마커 순서가 뒤집혀 있다"
 
 # ---- 3) 아이콘 캐시 확보 (다운로드는 검증 통과 후에만 캐시에 들어간다) --------
-mkdir -p icons
+mkdir -p "$ICON_DIR"
 for i in "${!names[@]}"; do
   slug="${slugs[$i]}"; url="${urls[$i]}"
   [ -n "$slug" ] || continue
-  if [ -f "icons/$slug.svg" ]; then
-    if reason=$(validate_icon "icons/$slug.svg"); then
+  if [ -f "$ICON_DIR/$slug.svg" ]; then
+    if reason=$(validate_icon "$ICON_DIR/$slug.svg"); then
       continue
     fi
     if [ -n "$url" ]; then
       echo "cache invalid ($slug): $reason -> 재다운로드"
-      rm -f "icons/$slug.svg"
+      rm -f "$ICON_DIR/$slug.svg"
       fetch_icon "$slug" "$url"
     else
       die "캐시된 아이콘이 유효하지 않고 재다운로드할 URL도 없다($slug): $reason"
     fi
   else
-    [ -n "$url" ] || die "icons/$slug.svg가 없고 URL도 없다"
+    [ -n "$url" ] || die "$ICON_DIR/$slug.svg가 없고 URL도 없다"
     fetch_icon "$slug" "$url"
   fi
 done
-if ! ls icons/LICENSE-* >/dev/null 2>&1; then
-  echo "warning: icons/에 제3자 라이선스 고지 파일(LICENSE-*)이 없다. 원본 커밋 시 함께 둔다." >&2
+if ! ls "$ICON_DIR"/LICENSE-* >/dev/null 2>&1; then
+  echo "warning: $ICON_DIR/에 제3자 라이선스 고지 파일(LICENSE-*)이 없다. 원본 커밋 시 함께 둔다." >&2
 fi
 
 # ---- 4) 태그 SVG 생성 -------------------------------------------------------
 for i in "${!names[@]}"; do
-  emit_tag "${names[$i]}" "${slugs[$i]}" > "${outs[$i]}"
-  echo "written: ${outs[$i]} (${names[$i]})"
+  emit_tag "${names[$i]}" "${slugs[$i]}" > "$OUT_DIR/${outs[$i]}"
+  echo "written: $OUT_DIR/${outs[$i]} (${names[$i]})"
 done
 
 # ---- 5) 배열에 없는 스테일 산출물 삭제 (tag- 접두사는 이 생성기의 예약 공간) --
 shopt -s nullglob
-for f in tag-*.svg; do
+for f in "$OUT_DIR"/tag-*.svg; do
   case "$seen_paths" in
-    *" $f "*) : ;;
+    *" ${f#"$OUT_DIR"/} "*) : ;;
     *) rm -f "$f"; echo "removed stale: $f" ;;
   esac
 done
@@ -295,7 +297,7 @@ shopt -u nullglob
 # ---- 6) README 마커 구간 재생성 ---------------------------------------------
 block=$(mktemp)
 for i in "${!names[@]}"; do
-  printf '<img src="./%s" alt="%s" />\n' "${outs[$i]}" "${names[$i]}" >> "$block"
+  printf '<img src="./%s/%s" alt="%s" />\n' "$OUT_DIR" "${outs[$i]}" "${names[$i]}" >> "$block"
 done
 tmp_readme=$(mktemp)
 awk -v s="$MARK_S" -v e="$MARK_E" -v blockfile="$block" '
