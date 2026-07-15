@@ -16,28 +16,38 @@ cd "$(dirname "$0")/.."
 #   1필드: 아이콘 없는 텍스트 필
 #   2필드: images/icons/<slug>.svg가 이미 있어야 한다 (직접 넣은 아이콘)
 #   3필드: 캐시에 없으면 URL에서 받아 images/icons/<slug>.svg로 저장한다
+# 항목 앞에 -를 붙이면 노출 보류: SVG는 생성/유지하되 README에는 주석 처리된
+# <img>로 내보낸다 (마커 구간은 재생성되므로 README 손편집 주석은 유지되지 않는다).
 # 제약: 표시이름은 ASCII(영숫자, # + . / - 공백)만, slug는 ^[a-z0-9][a-z0-9-]*$.
 #       URL이 있으면 slug 필수. 다색/스타일 기반/외부 참조 아이콘은 검증에서 거부된다.
 DEVICON="https://raw.githubusercontent.com/devicons/devicon/master/icons"
+# 순서 = 서사다. 방문자가 왼쪽부터 "뭐 하는 사람인지 -> 무엇이 중요한지"로 읽도록
+# 정체성(게임/프레임워크) -> 언어 폭 -> 웹 스택 -> 데이터/인프라 -> 도구/습관 순으로 둔다.
 tags=(
+  # 정체성: 게임/프레임워크 핵심
   "C#|csharp|$DEVICON/csharp/csharp-plain.svg"
+  "Unity|unity|$DEVICON/unity/unity-plain.svg"
   "C/C++|cplusplus|$DEVICON/cplusplus/cplusplus-plain.svg"
   ".NET|dotnet|$DEVICON/dot-net/dot-net-plain.svg"
-  "Unity|unity|$DEVICON/unity/unity-plain.svg"
+  # 언어 폭
   "Python|python|$DEVICON/python/python-plain.svg"
   "TypeScript|typescript|$DEVICON/typescript/typescript-plain.svg"
+  "JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
+  # 웹 스택
+  "React|react|$DEVICON/react/react-original.svg"
+  "Next.js|nextjs|$DEVICON/nextjs/nextjs-plain.svg"
+  "Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
+  # 데이터/인프라
   "PostgreSQL|postgresql|$DEVICON/postgresql/postgresql-plain.svg"
   "Docker|docker|$DEVICON/docker/docker-plain.svg"
   "Synology|synology"  # 공식 로고가 워드마크뿐이라 직접 그린 NAS 픽토그램을 쓴다 (icons/synology.svg, 자체 제작)
+  # 도구/습관
   "Git|git|$DEVICON/git/git-plain.svg"
-  "GitHub|github|$DEVICON/github/github-original.svg"
-  "Visual Studio|visualstudio|$DEVICON/visualstudio/visualstudio-plain.svg"
-  "VS Code|vscode|$DEVICON/vscode/vscode-plain.svg"
   "Notion|notion|$DEVICON/notion/notion-plain.svg"
-  "JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
-  "Next.js|nextjs|$DEVICON/nextjs/nextjs-plain.svg"
-  "React|react|$DEVICON/react/react-original.svg"
-  "Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
+  # 기본기/에디터 태그는 정보량이 낮아 노출 보류 (- 접두사: README에 주석 처리)
+  "-GitHub|github|$DEVICON/github/github-original.svg"
+  "-Visual Studio|visualstudio|$DEVICON/visualstudio/visualstudio-plain.svg"
+  "-VS Code|vscode|$DEVICON/vscode/vscode-plain.svg"
 )
 
 # ---- 디자인 상수 -----------------------------------------------------------
@@ -238,9 +248,13 @@ SVG
 # ---- 1) 입력 검증 (쓰기 전에 전부 확인해 실패를 앞당긴다) --------------------
 name_re='^[A-Za-z0-9#+./ -]+$'
 slug_re='^[a-z0-9][a-z0-9-]*$'
-names=() slugs=() urls=() outs=()
+names=() slugs=() urls=() outs=() hiddens=()
 seen_paths=" "
 for entry in "${tags[@]}"; do
+  hidden=0
+  case "$entry" in
+    -*) hidden=1; entry="${entry#-}" ;;   # 노출 보류 플래그 (표시 이름은 -로 시작할 수 없다)
+  esac
   IFS='|' read -r name slug url <<< "$entry"
   [ -n "$name" ] || die "표시 이름이 빈 항목이 있다: '$entry'"
   [[ "$name" =~ $name_re ]] || die "표시 이름에 허용 밖 문자가 있다: '$name' (ASCII 영숫자, # + . / - 공백만)"
@@ -259,7 +273,7 @@ for entry in "${tags[@]}"; do
     *" $out "*) die "산출물 경로가 겹친다: $out" ;;
   esac
   seen_paths="$seen_paths$out "
-  names+=("$name"); slugs+=("$slug"); urls+=("$url"); outs+=("$out")
+  names+=("$name"); slugs+=("$slug"); urls+=("$url"); outs+=("$out"); hiddens+=("$hidden")
 done
 
 # ---- 2) README 마커 검증 (치환 전에 정확히 한 쌍인지 확인) -------------------
@@ -318,7 +332,11 @@ shopt -u nullglob
 block=$(mktemp)
 printf '<div>\n' > "$block"
 for i in "${!names[@]}"; do
-  printf '<img src="./%s/%s" alt="%s" />\n' "$OUT_DIR" "${outs[$i]}" "${names[$i]}" >> "$block"
+  if [ "${hiddens[$i]}" = 1 ]; then
+    printf '<!-- <img src="./%s/%s" alt="%s" /> -->\n' "$OUT_DIR" "${outs[$i]}" "${names[$i]}" >> "$block"
+  else
+    printf '<img src="./%s/%s" alt="%s" />\n' "$OUT_DIR" "${outs[$i]}" "${names[$i]}" >> "$block"
+  fi
 done
 printf '</div>\n' >> "$block"
 tmp_readme=$(mktemp)
