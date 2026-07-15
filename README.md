@@ -1,4 +1,4 @@
-> “Everybody in this country should learn how to program a computer, because it teaches you how to think.”<br> — Steve Jobs, *The Lost Interview* (1995)
+> “Everybody in this country should learn how to program a computer, because it teaches you how to think.”<br> - Steve Jobs, *The Lost Interview* (1995)
 
 저에게 개발은 남은 평생 이어가고 싶은 일입니다.<br>설계에서 재미를, 구현에서 자신감을, 누군가에게 도움이 될 때 보람을 느낍니다.<br>그 과정에서 쌓은 경험을 GitHub에서 함께 나누고 싶습니다.
 
@@ -22,6 +22,7 @@
      <br clear> 뒤라 위 플로트 레이아웃과 간섭이 없고, 뒤에 붙인 <br/>이
      위 섹션과의 세로 간격(빈 줄 하나)을 만든다. -->
 <!-- tech-tags:start -->
+<div>
 <img src="./images/tag-csharp.svg" alt="C#" />
 <img src="./images/tag-cplusplus.svg" alt="C/C++" />
 <img src="./images/tag-dotnet.svg" alt=".NET" />
@@ -30,6 +31,7 @@
 <img src="./images/tag-typescript.svg" alt="TypeScript" />
 <img src="./images/tag-postgresql.svg" alt="PostgreSQL" />
 <img src="./images/tag-docker.svg" alt="Docker" />
+</div>
 <!-- tech-tags:end -->
 
 <!--
