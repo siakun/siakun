@@ -8,12 +8,12 @@
      카드와 같은 행에 끼고, raw 텍스트로 두면 좁은 폭에서 짜부라지기 때문.
      <br/>은 clear 없는 순수 줄바꿈이라 metrics 플로트에 영향이 없다. PROJECT.md 참고. -->
 <div>
-  <img src="./github-metrics.svg" alt="GitHub Metrics" width="420" align="left" />
-  <img src="./org-header.svg" alt="🗂️ 다른 공간의 저장소들" /><br/>
-  <a href="https://github.com/siakun-private"><img src="./org-private.svg" alt="siakun-private" align="left" /></a>
-  <a href="https://github.com/siakun-testing"><img src="./org-testing.svg" alt="siakun-testing" align="left" /></a>
-  <a href="https://github.com/siakun-archive"><img src="./org-archive.svg" alt="siakun-archive" align="left" /></a>
-  <a href="https://github.com/siakun-forks"><img src="./org-forks.svg" alt="siakun-forks" align="left" /></a>
+  <img src="./images/github-metrics.svg" alt="GitHub Metrics" width="420" align="left" />
+  <img src="./images/org-header.svg" alt="🗂️ 다른 공간의 저장소들" /><br/>
+  <a href="https://github.com/siakun-private"><img src="./images/org-private.svg" alt="siakun-private" align="left" /></a>
+  <a href="https://github.com/siakun-testing"><img src="./images/org-testing.svg" alt="siakun-testing" align="left" /></a>
+  <a href="https://github.com/siakun-archive"><img src="./images/org-archive.svg" alt="siakun-archive" align="left" /></a>
+  <a href="https://github.com/siakun-forks"><img src="./images/org-forks.svg" alt="siakun-forks" align="left" /></a>
 </div>
 
 <br clear="both" /><br/>
@@ -22,14 +22,14 @@
      <br clear> 뒤라 위 플로트 레이아웃과 간섭이 없고, 뒤에 붙인 <br/>이
      위 섹션과의 세로 간격(빈 줄 하나)을 만든다. -->
 <!-- tech-tags:start -->
-<img src="./tag-csharp.svg" alt="C#" />
-<img src="./tag-cplusplus.svg" alt="C/C++" />
-<img src="./tag-dotnet.svg" alt=".NET" />
-<img src="./tag-unity.svg" alt="Unity" />
-<img src="./tag-python.svg" alt="Python" />
-<img src="./tag-typescript.svg" alt="TypeScript" />
-<img src="./tag-postgresql.svg" alt="PostgreSQL" />
-<img src="./tag-docker.svg" alt="Docker" />
+<img src="./images/tag-csharp.svg" alt="C#" />
+<img src="./images/tag-cplusplus.svg" alt="C/C++" />
+<img src="./images/tag-dotnet.svg" alt=".NET" />
+<img src="./images/tag-unity.svg" alt="Unity" />
+<img src="./images/tag-python.svg" alt="Python" />
+<img src="./images/tag-typescript.svg" alt="TypeScript" />
+<img src="./images/tag-postgresql.svg" alt="PostgreSQL" />
+<img src="./images/tag-docker.svg" alt="Docker" />
 <!-- tech-tags:end -->
 
 <!--

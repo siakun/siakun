@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 조직별 북마크 카드 SVG(org-*.svg) 생성기.
+# 조직별 북마크 카드 SVG(images/org-*.svg) 생성기.
 # - GitHub API에서 공개/비공개 리포 수를 읽어 카드 우하단에 표시한다.
 # - 비공개 수(total_private_repos)는 조직 접근 권한이 있는 토큰(GH_TOKEN)이 있어야 나온다.
 #   토큰이 없으면 공개 수만 표시한다.
@@ -114,12 +114,14 @@ emit_header() {
 SVG
 }
 
-emit_header > org-header.svg
-echo "written: org-header.svg"
+mkdir -p images
+
+emit_header > images/org-header.svg
+echo "written: images/org-header.svg"
 
 for i in "${!orgs[@]}"; do
   org="${orgs[$i]}"
-  out="org-${shorts[$i]}.svg"
+  out="images/org-${shorts[$i]}.svg"
   counts=$(fetch_counts "$org")
   emit_card "$org" "${descs[$i]}" "$counts" > "$out"
   echo "written: $out (${counts:-no counts})"
