@@ -13,13 +13,15 @@ set -euo pipefail
 # 저장소 루트에서 실행해도, scripts/에서 실행해도 동작하도록 출력 위치를 고정한다
 cd "$(dirname "$0")/.."
 
-orgs=(siakun-private siakun-testing siakun-archive siakun-forks)
-shorts=(private testing archive forks)
+# 배열 순서는 README의 카드 배치 순서와 맞춘다. orgs/shorts/descs는 같은 인덱스끼리 짝이므로
+# 하나를 옮기면 셋 다 같이 옮긴다.
+orgs=(siakun-testing siakun-archive siakun-private siakun-forks)
+shorts=(testing archive private forks)
 # 설명은 카드 한 줄에 들어가는 길이로 유지한다 (아바타 제외 유효 폭 약 300px)
 descs=(
-  "비공개 위주의 개인 작업 공간입니다."
   "아이디어를 빠르게 시험하는 공간입니다."
-  "완료한 작업을 보관하는 공간입니다."
+  "지난 작업을 보관하는 공간입니다."
+  "비공개 위주의 개인 작업 공간입니다."
   "참고용으로 포크한 저장소 모음입니다."
 )
 

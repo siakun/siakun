@@ -10,9 +10,9 @@
 <div>
   <img src="./images/github-metrics.svg" alt="GitHub Metrics" width="420" align="left" />
   <img src="./images/org-header.svg" alt="🗂️ 다른 공간의 저장소들" /><br/>
-  <a href="https://github.com/siakun-private"><img src="./images/org-private.svg" alt="siakun-private" align="left" /></a>
   <a href="https://github.com/siakun-testing"><img src="./images/org-testing.svg" alt="siakun-testing" align="left" /></a>
   <a href="https://github.com/siakun-archive"><img src="./images/org-archive.svg" alt="siakun-archive" align="left" /></a>
+  <a href="https://github.com/siakun-private"><img src="./images/org-private.svg" alt="siakun-private" align="left" /></a>
   <a href="https://github.com/siakun-forks"><img src="./images/org-forks.svg" alt="siakun-forks" align="left" /></a>
 </div>
 
