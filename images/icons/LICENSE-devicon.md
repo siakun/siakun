@@ -1,7 +1,8 @@
 # Devicon 라이선스 고지
 
-icons/ 폴더의 아이콘 원본은 [devicon](https://github.com/devicons/devicon)에서 가져왔으며,
-이 원본과 그 파생물(tag-*.svg)에는 아래 MIT 라이선스가 적용된다.
+icons/ 폴더의 아이콘 원본은 [devicon](https://github.com/devicons/devicon)에서 가져왔으며
+이 원본과 그 파생물(tag-*.svg)에는 아래 MIT 라이선스가 적용됩니다.
+devicon에 없어 직접 그린 아이콘은 예외로, 저작권자가 siakun이고 조건은 아래 MIT 라이선스와 같습니다.
 
 ```
 The MIT License (MIT)
