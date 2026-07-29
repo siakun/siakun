@@ -23,20 +23,25 @@ cd "$(dirname "$0")/.."
 DEVICON="https://raw.githubusercontent.com/devicons/devicon/master/icons"
 # 순서 = 서사다. 방문자가 왼쪽부터 "뭐 하는 사람인지 -> 무엇이 중요한지"로 읽도록
 # 정체성(게임/프레임워크) -> 언어 폭 -> 웹 스택 -> 데이터/인프라 -> 도구/습관 순으로 둔다.
+# 노출의 1차 기준은 실무 비중이다. 근거를 대지 못하는 태그 하나가 나머지 태그의 신뢰도까지
+# 떨어뜨리므로, 실무에서 쓴 것만 남긴다. 웹 스택은 이 프로필이 앞세우는 C# 계열과
+# 초점이 갈리므로 대표 2개(TypeScript, Next.js)만 노출한다.
+# 보류 항목은 배열에서 지우지 않고 - 접두사만 붙여, -를 떼면 원래 순서로 돌아오게 둔다.
 tags=(
-  # 정체성: 게임/프레임워크 핵심
+  # 정체성: 게임/프레임워크 핵심 (C# 계열을 앞에 모아 직무 적합성을 먼저 읽히게 한다)
   "C#|csharp|$DEVICON/csharp/csharp-plain.svg"
   "Unity|unity|$DEVICON/unity/unity-plain.svg"
-  "C/C++|cplusplus|$DEVICON/cplusplus/cplusplus-plain.svg"
+  "WPF|wpf"  # devicon에 WPF 아이콘이 없어 직접 그린 앱 창 픽토그램을 쓴다 (icons/wpf.svg, 자체 제작)
   ".NET|dotnet|$DEVICON/dot-net/dot-net-plain.svg"
   # 언어 폭
+  "-C/C++|cplusplus|$DEVICON/cplusplus/cplusplus-plain.svg"
   "Python|python|$DEVICON/python/python-plain.svg"
   "TypeScript|typescript|$DEVICON/typescript/typescript-plain.svg"
-  "JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
+  "-JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
   # 웹 스택
-  "React|react|$DEVICON/react/react-original.svg"
+  "-React|react|$DEVICON/react/react-original.svg"
   "Next.js|nextjs|$DEVICON/nextjs/nextjs-plain.svg"
-  "Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
+  "-Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
   # 데이터/인프라
   "PostgreSQL|postgresql|$DEVICON/postgresql/postgresql-plain.svg"
   "Docker|docker|$DEVICON/docker/docker-plain.svg"

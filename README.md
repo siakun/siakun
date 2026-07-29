@@ -25,14 +25,15 @@
 <div>
 <img src="./images/tag-csharp.svg" alt="C#" />
 <img src="./images/tag-unity.svg" alt="Unity" />
-<img src="./images/tag-cplusplus.svg" alt="C/C++" />
+<img src="./images/tag-wpf.svg" alt="WPF" />
 <img src="./images/tag-dotnet.svg" alt=".NET" />
+<!-- <img src="./images/tag-cplusplus.svg" alt="C/C++" /> -->
 <img src="./images/tag-python.svg" alt="Python" />
 <img src="./images/tag-typescript.svg" alt="TypeScript" />
-<img src="./images/tag-javascript.svg" alt="JavaScript" />
-<img src="./images/tag-react.svg" alt="React" />
+<!-- <img src="./images/tag-javascript.svg" alt="JavaScript" /> -->
+<!-- <img src="./images/tag-react.svg" alt="React" /> -->
 <img src="./images/tag-nextjs.svg" alt="Next.js" />
-<img src="./images/tag-nodejs.svg" alt="Node.js" />
+<!-- <img src="./images/tag-nodejs.svg" alt="Node.js" /> -->
 <img src="./images/tag-postgresql.svg" alt="PostgreSQL" />
 <img src="./images/tag-docker.svg" alt="Docker" />
 <img src="./images/tag-synology.svg" alt="Synology" />
