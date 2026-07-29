@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # 기술 태그 SVG(images/tag-*.svg) 생성기 + README 동기화.
 # - 아래 tags 배열이 단일 소스다. 태그 변경 = 배열 수정 + 이 스크립트 실행으로 끝난다.
-# - 아이콘은 images/icons/<slug>.svg 캐시에서 읽고, 없으면 소스 URL에서 1회 내려받아 검증 후 저장한다.
+# - 아이콘은 images/icons/<slug>.svg 캐시에서 읽는다. 없으면 소스 URL에서 1회 내려받아 검증 후 저장한다.
 # - 아이콘 벡터를 태그 SVG 안에 인라인한다(<img> 임베드 SVG는 외부 리소스를 못 불러온다).
-# - README.md의 tech-tags 마커 구간을 재생성하고, 배열에 없는 tag-*.svg는 삭제한다.
+# - README.md의 tech-tags 마커 구간을 재생성하고 배열에 없는 tag-*.svg는 삭제한다.
 # - 팔레트는 org 카드와 동일한 테마 중립 모노톤이다(Safari <img> SVG 미디어 쿼리 미지원).
 # 설계 배경: docs/superpowers/specs/2026-07-15-tech-tags-design.md, PROJECT.md 참고.
 set -euo pipefail
@@ -23,20 +23,25 @@ cd "$(dirname "$0")/.."
 DEVICON="https://raw.githubusercontent.com/devicons/devicon/master/icons"
 # 순서 = 서사다. 방문자가 왼쪽부터 "뭐 하는 사람인지 -> 무엇이 중요한지"로 읽도록
 # 정체성(게임/프레임워크) -> 언어 폭 -> 웹 스택 -> 데이터/인프라 -> 도구/습관 순으로 둔다.
+# 노출의 1차 기준은 실무 비중이다. 근거를 대지 못하는 태그 하나가 나머지 태그의 신뢰도까지
+# 떨어뜨리므로, 실무에서 쓴 것만 남긴다. 웹 스택은 이 프로필이 앞세우는 C# 계열과
+# 초점이 갈리므로 대표 2개(TypeScript, Next.js)만 노출한다.
+# 보류 항목은 배열에서 지우지 않고 - 접두사만 붙여, -를 떼면 원래 순서로 돌아오게 둔다.
 tags=(
-  # 정체성: 게임/프레임워크 핵심
+  # 정체성: 게임/프레임워크 핵심 (C# 계열을 앞에 모아 직무 적합성을 먼저 읽히게 한다)
   "C#|csharp|$DEVICON/csharp/csharp-plain.svg"
   "Unity|unity|$DEVICON/unity/unity-plain.svg"
-  "C/C++|cplusplus|$DEVICON/cplusplus/cplusplus-plain.svg"
+  "WPF|wpf"  # devicon에 WPF 아이콘이 없어 직접 그린 앱 창 픽토그램을 쓴다 (icons/wpf.svg, 자체 제작)
   ".NET|dotnet|$DEVICON/dot-net/dot-net-plain.svg"
   # 언어 폭
+  "-C/C++|cplusplus|$DEVICON/cplusplus/cplusplus-plain.svg"
   "Python|python|$DEVICON/python/python-plain.svg"
   "TypeScript|typescript|$DEVICON/typescript/typescript-plain.svg"
-  "JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
+  "-JavaScript|javascript|$DEVICON/javascript/javascript-plain.svg"
   # 웹 스택
-  "React|react|$DEVICON/react/react-original.svg"
+  "-React|react|$DEVICON/react/react-original.svg"
   "Next.js|nextjs|$DEVICON/nextjs/nextjs-plain.svg"
-  "Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
+  "-Node.js|nodejs|$DEVICON/nodejs/nodejs-plain.svg"
   # 데이터/인프라
   "PostgreSQL|postgresql|$DEVICON/postgresql/postgresql-plain.svg"
   "Docker|docker|$DEVICON/docker/docker-plain.svg"
@@ -125,7 +130,7 @@ validate_icon() { # $1=파일
   flat=$(xml_flat "$1")
 
   # 문서 루트 판정: XML 선언/DOCTYPE/주석을 걷어낸 첫 요소가 <svg>여야 한다.
-  # "<svg 문자열 포함" 검사는 SVG가 박힌 HTML 페이지도 통과하므로 문서 단위로 본다.
+  # "<svg 문자열 포함" 검사는 SVG가 들어 있는 HTML 페이지도 통과하므로 문서 단위로 본다.
   s="$flat"
   while true; do
     s="${s#"${s%%[![:space:]]*}"}"
@@ -206,7 +211,7 @@ inline_icon() { # $1=slug
 
   # 내부 paint 정규화: none은 보존하고(투명 영역 유지) 나머지 색만 INK로 치환한다.
   # 일반 치환의 값 패턴은 ~로 시작하지 않는 값만 잡는다. [^"]*로 잡으면
-  # 보호 마커(~NONE~)까지 다시 매칭되어 none 보존이 무력화되기 때문이다.
+  # 보호 마커(~NONE~)까지 다시 매칭되어 none 보존이 풀리기 때문이다.
   inner=$(printf '%s' "$inner" | sed -E '
     s/(fill|stroke)="[Nn][Oo][Nn][Ee]"/\1="~NONE~"/g
     s/fill="[^~"][^"]*"/fill="'"$INK"'"/g
