@@ -1,6 +1,6 @@
 # Devicon 라이선스 고지
 
-icons/ 폴더의 아이콘 원본은 [devicon](https://github.com/devicons/devicon)에서 가져왔으며,
+icons/ 폴더의 아이콘 원본은 [devicon](https://github.com/devicons/devicon)에서 가져왔으며
 이 원본과 그 파생물(tag-*.svg)에는 아래 MIT 라이선스가 적용된다.
 
 ```

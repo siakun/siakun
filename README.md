@@ -5,7 +5,7 @@
 <!-- 2단 레이아웃: metrics와 카드 4장은 왼쪽 플로트, 헤더는 일반 인라인 + <br/>.
      와이드: 헤더/카드가 metrics 오른쪽 열에 쌓임. 중간 폭: 헤더가 자기 행을 차지하고
      카드만 2열 격자. 모바일: 세로 스택. 헤더가 인라인인 이유: 플로트로 두면 격자에서
-     카드와 같은 행에 끼고, raw 텍스트로 두면 좁은 폭에서 짜부라지기 때문.
+     카드와 같은 행에 끼고 raw 텍스트로 두면 좁은 폭에서 짜부라지기 때문.
      <br/>은 clear 없는 순수 줄바꿈이라 metrics 플로트에 영향이 없다. PROJECT.md 참고. -->
 <div>
   <img src="./images/github-metrics.svg" alt="GitHub Metrics" width="420" align="left" />
@@ -19,7 +19,7 @@
 <br clear="both" /><br/>
 
 <!-- 기술 태그: scripts/gen-tech-tags.sh가 아래 구간을 생성한다. 손으로 편집하지 않는다.
-     <br clear> 뒤라 위 플로트 레이아웃과 간섭이 없고, 뒤에 붙인 <br/>이
+     <br clear> 뒤라 위 플로트 레이아웃과 간섭이 없고 뒤에 붙인 <br/>이
      위 섹션과의 세로 간격(빈 줄 하나)을 만든다. -->
 <!-- tech-tags:start -->
 <div>
