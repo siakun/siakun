@@ -7,6 +7,7 @@
 | 파일 | 역할 | 생성 방식 |
 |------|------|-----------|
 | `README.md` | 프로필 대문 | 직접 편집 (방문자 대상이라 존댓말 유지) |
+| `CLAUDE.md` | 이 저장소의 작업 규칙(트렁크 기반 브랜치 전략, 커밋 절차) | 직접 편집 |
 | `images/github-metrics.svg` | GitHub 활동 요약 이미지 | `lowlighter/metrics`가 CI에서 자동 생성 |
 | `images/org-*.svg` | 조직 섹션 헤더와 조직별 북마크 카드 | `scripts/gen-org-cards.sh`가 CI에서 자동 생성 |
 | `scripts/gen-org-cards.sh` | 조직 카드 생성기 | 직접 편집 |
