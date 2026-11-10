@@ -116,7 +116,7 @@ README 맨 아래(`<br clear="both">` 뒤라 플로트 레이아웃과 간섭 �
   - `plugin_lines`: 코드 작성량. 구현 중심 역량 시그널.
   - `plugin_languages`: 사용 언어 분포. 직무 적합성(C# 최다)을 보여주는 핵심 자산이다.
 - **트리거**: 매일 00:00 UTC 스케줄, `workflow_dispatch` 수동 실행, main push.
-- **주의**: metrics 액션은 push마다 돌며 `images/github-metrics.svg`를 origin에 자동 커밋한다. 그래서 로컬과 origin이 자주 발산한다. 푸시 전에 `git pull --rebase origin main`으로 원격의 자동 커밋을 먼저 당긴다.
+- **주의**: metrics 액션은 push마다 돌며 `images/github-metrics.svg`를 origin에 자동 커밋한다. 그래서 로컬과 origin이 자주 발산한다. 푸시 전에 `git pull --rebase origin main`으로 원격의 자동 커밋을 먼저 당긴다. 자동 커밋이 쌓이지 않게 하는 방법(전용 브랜치 발행, 조건부 amend)과 각 방법의 전제는 `docs/ci-auto-commit-history.md`에 있다.
 
 ## 3. lowlighter/metrics 저장소 필터링 메커니즘
 
