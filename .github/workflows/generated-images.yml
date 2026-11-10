@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 구성/필터 정책과 근거는 저장소 루트 PROJECT.md 참고
       - uses: lowlighter/metrics@latest
