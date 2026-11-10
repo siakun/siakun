@@ -1,0 +1,2 @@
+# CI가 output 브랜치에 발행하는 생성 이미지. main에는 커밋하지 않는다.
+/generated/

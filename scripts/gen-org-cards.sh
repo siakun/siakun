@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# 조직별 북마크 카드 SVG(images/org-*.svg) 생성기.
+# 조직별 북마크 카드 SVG(generated/org-*.svg) 생성기.
+# - generated/는 git이 추적하지 않는다. CI가 이 폴더를 output 브랜치에 발행하고
+#   README는 그 브랜치의 파일을 참조한다. 로컬 실행 결과는 미리보기용이다.
 # - GitHub API에서 공개/비공개 리포 수를 읽어 카드 우하단에 표시한다.
 # - 비공개 수(total_private_repos)는 조직 접근 권한이 있는 토큰(GH_TOKEN)이 있어야 나온다.
 #   토큰이 없으면 공개 수만 표시한다.
@@ -116,14 +118,15 @@ emit_header() {
 SVG
 }
 
-mkdir -p images
+OUT=generated   # scripts/publish-generated.sh가 발행하는 폴더와 같아야 한다
+mkdir -p "$OUT"
 
-emit_header > images/org-header.svg
-echo "written: images/org-header.svg"
+emit_header > "$OUT/org-header.svg"
+echo "written: $OUT/org-header.svg"
 
 for i in "${!orgs[@]}"; do
   org="${orgs[$i]}"
-  out="images/org-${shorts[$i]}.svg"
+  out="$OUT/org-${shorts[$i]}.svg"
   counts=$(fetch_counts "$org")
   emit_card "$org" "${descs[$i]}" "$counts" > "$out"
   echo "written: $out (${counts:-no counts})"

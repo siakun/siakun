@@ -27,6 +27,24 @@ GitHub Actions 같은 CI가 생성물(통계 이미지, 배지, 데이터 파일
 - `peaceiris/actions-gh-pages`: `publish_branch`로 대상 브랜치를 정하고 `force_orphan: true`로 최신 커밋 하나만 남긴다.
 - `crazy-max/ghaction-github-pages`: `target_branch`로 대상 브랜치를 정한다. `keep_history` 기본값이 `false`여서 별도 설정 없이 매번 force push한다.
 
+액션 없이 git 명령으로도 같은 발행을 할 수 있다. 워크플로가 이미 저장소를 체크아웃했다면 그 저장소의 `origin`과 인증을 그대로 사용하므로 토큰을 따로 넘기지 않아도 된다.
+
+```bash
+# 발행할 폴더($SRC)만 담은 트리를 임시 인덱스로 만든다. 체크아웃한 워크트리와 인덱스는 그대로다
+tree=$(GIT_INDEX_FILE="$tmp/index" git --work-tree="$SRC" add -A && GIT_INDEX_FILE="$tmp/index" git write-tree)
+
+# 원격의 트리와 같으면 발행하지 않는다. 브랜치가 아직 없으면 fetch가 실패하고 발행으로 넘어간다
+if git fetch -q --depth 1 origin "$BRANCH" 2>/dev/null &&
+   [ "$(git rev-parse 'FETCH_HEAD^{tree}')" = "$tree" ]; then
+  exit 0
+fi
+
+commit=$(git commit-tree "$tree" -m "Update generated files")   # -p를 주지 않아 부모 없는 커밋이 된다
+git push --force origin "$commit:refs/heads/$BRANCH"
+```
+
+방법 2와 달리 여기서는 `--force`와 깊이 1 체크아웃이 문제가 되지 않는다. 발행할 때마다 생성물 전체를 새로 만들어 브랜치를 교체하므로 덮어써서 잃는 내용이 없고, 새 커밋에 부모가 없으니 로컬에 이전 히스토리가 없어도 된다.
+
 README 같은 문서는 상대 경로 대신 그 브랜치의 raw URL로 생성물을 참조한다.
 
 ```
@@ -37,6 +55,11 @@ https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<file>
 
 - 위 설정으로 발행하면 브랜치 내용이 발행한 디렉터리 내용으로 통째로 교체된다. 생성기 여럿이 같은 브랜치에 따로 발행하면 나중에 발행한 쪽이 앞의 파일을 삭제한다. 생성기마다 브랜치를 나누거나, 한 워크플로에서 생성물을 모아 한 번에 발행한다.
 - 생성물의 과거 버전이 남지 않는다. 변화 추이를 git 히스토리로 추적해야 하면 이 방법이 맞지 않는다.
+
+통째 교체는 실수 두 가지로 이어지므로 함께 막는다.
+
+- **일부만 생성된 채 발행.** 생성 스텝 하나가 빠지거나 건너뛰어진 상태로 발행하면 그 파일이 브랜치에서 사라지고, 그 파일을 참조하는 문서의 이미지가 깨진다. 발행 전에 문서가 그 브랜치에서 참조하는 파일 목록을 문서에서 직접 읽어 모두 있는지 확인하고, 하나라도 없으면 발행하지 않는다. 목록을 스크립트에 따로 적어 두면 문서와 어긋난다.
+- **기본 브랜치에서 방법 1로 전환하는 순서.** 문서가 새 URL을 가리키는 커밋이 발행 브랜치보다 먼저 원격에 올라가면 첫 발행이 끝날 때까지 이미지가 깨지고, 새 워크플로가 실패하면 깨진 채로 남는다. 현재 생성물로 발행 브랜치를 먼저 만들어 두고(또는 같은 push에 함께 올리고) 문서를 전환한다.
 
 ## 방법 2: 직전 커밋이 자기 커밋일 때만 amend
 
@@ -146,6 +169,20 @@ fork-point는 reflog에 기댄다. 옛 봇 커밋을 받은 지 오래되어 원
 
 bare 저장소를 원격으로 두고 사람 clone과 봇 clone을 번갈아 조작해 확인했다(Git 2.47). 봇 clone은 `file://` URL로 만든다. 로컬 경로로 clone하면 `--depth`가 무시되어 shallow 조건을 재현할 수 없다. `git commit --trailer`는 Git 2.32 이상이 필요하다.
 
+방법 1의 git 명령 발행은 참조 파일 확인을 앞에 추가한 스크립트로 확인했다.
+
+| 조건 | 결과 |
+|---|---|
+| 발행 브랜치가 아직 없음 | 브랜치 생성, 커밋 1개, 부모 0개 |
+| 생성물 변화 없음 | 발행 생략 |
+| 생성물 내용 변경 | 브랜치 끝이 새 커밋으로 교체, 커밋 수는 그대로 1개 |
+| 발행 폴더에서 파일 하나를 삭제하고 발행 | 브랜치에서도 그 파일이 사라짐 |
+| 문서가 참조하는 파일이 발행 폴더에 없음 | 확인 단계에서 실패로 종료, 원격 변화 없음 |
+| 깊이 1 체크아웃에서 발행 | 정상 발행, 기본 브랜치 히스토리 변화 없음 |
+| 발행 전후의 체크아웃 상태 | HEAD, 인덱스, 워크트리 모두 그대로 |
+
+방법 2의 스크립트는 아래와 같이 동작했다.
+
 | 조건 | 결과 |
 |---|---|
 | 사람 커밋이 끝에 있음 | 새 봇 커밋 |
@@ -182,10 +219,12 @@ git clone --depth 2 file:///path/to/remote.git bot    # 봇 체크아웃
 
 ## 이 저장소에 적용할 때
 
-- README가 `<img src>`로 참조하는 두 생성물 `images/github-metrics.svg`와 `images/org-*.svg`는 모두 방법 1을 적용할 수 있다.
-- [metrics.yml](../.github/workflows/metrics.yml)의 `lowlighter/metrics`는 기본 설정(`output_action: commit`)에서 GitHub REST API(`createOrUpdateFileContents`)로 직접 커밋하므로 git 명령이 끼어들 자리가 없다. `output_action: none`이면 커밋하지 않고 러너의 `/metrics_renders` 디렉터리에 파일만 생성한다.
-- [org-cards.yml](../.github/workflows/org-cards.yml)은 git 명령으로 직접 커밋하므로 커밋 스텝만 교체하면 된다.
-- 두 워크플로가 같은 발행 브랜치를 사용하면 방법 1의 통째 교체 한계에 걸린다.
+README가 `<img src>`로 참조하는 CI 생성물(metrics 이미지와 조직 카드)에 방법 1을 적용했다. 구성과 운영 규칙은 `PROJECT.md` 1장 "생성 이미지 발행" 절에 있고, 여기에는 방법을 적용하며 내린 판단만 적는다.
+
+- **생성기 둘을 [generated-images.yml](../.github/workflows/generated-images.yml)의 job 하나에 모았다.** 워크플로를 나눠 같은 브랜치에 따로 발행하면 통째 교체 한계에 걸리고, 브랜치를 나누면 관리할 브랜치가 늘어난다. 두 생성물은 README의 한 구간에 함께 쓰이므로 한 번에 발행하는 쪽을 골랐다.
+- **`lowlighter/metrics`는 `output_action: none`으로 실행한다.** 기본 설정(`commit`)은 GitHub REST API(`createOrUpdateFileContents`)로 직접 커밋하므로 git 명령이 끼어들 자리가 없다. `none`이면 커밋하지 않고 러너의 `/metrics_renders/<filename>`에 파일만 생성하므로 다음 스텝에서 발행 폴더로 복사한다.
+- **발행은 액션 대신 [publish-generated.sh](../scripts/publish-generated.sh)의 git 명령으로 한다.** 발행 전에 README의 참조 파일을 확인하는 단계가 필요했고, 그 확인과 발행을 한 스크립트에 두면 로컬에서 bare 저장소를 상대로 그대로 검증할 수 있다.
+- **액션의 `committer_branch` 옵션으로 발행 브랜치를 지정하는 방법은 고르지 않았다.** 기본 브랜치에서는 봇 커밋이 사라지지만 발행 브랜치에는 실행마다 커밋이 계속 쌓이고, git 명령으로 커밋하는 조직 카드 쪽은 같은 브랜치에 맞춰 따로 처리해야 한다.
 
 ## 근거
 

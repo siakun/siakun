@@ -6,14 +6,16 @@
      와이드: 헤더/카드가 metrics 오른쪽 열에 쌓임. 중간 폭: 헤더가 자기 행을 차지하고
      카드만 2열 격자. 모바일: 세로 스택. 헤더가 인라인인 이유: 플로트로 두면 격자에서
      카드와 같은 행에 끼고 raw 텍스트로 두면 좁은 폭에서 짜부라지기 때문.
-     <br/>은 clear 없는 순수 줄바꿈이라 metrics 플로트에 영향이 없다. PROJECT.md 참고. -->
+     <br/>은 clear 없는 순수 줄바꿈이라 metrics 플로트에 영향이 없다. PROJECT.md 참고.
+     이 구간의 이미지는 CI가 output 브랜치에 발행하는 생성물이라 그 브랜치의 raw URL로 참조한다.
+     scripts/publish-generated.sh가 이 URL들을 읽어 발행 전에 파일이 모두 있는지 확인한다. -->
 <div>
-  <img src="./images/github-metrics.svg" alt="GitHub Metrics" width="420" align="left" />
-  <img src="./images/org-header.svg" alt="🗂️ 다른 공간의 저장소들" /><br/>
-  <a href="https://github.com/siakun-testing"><img src="./images/org-testing.svg" alt="siakun-testing" align="left" /></a>
-  <a href="https://github.com/siakun-archive"><img src="./images/org-archive.svg" alt="siakun-archive" align="left" /></a>
-  <a href="https://github.com/siakun-private"><img src="./images/org-private.svg" alt="siakun-private" align="left" /></a>
-  <a href="https://github.com/siakun-forks"><img src="./images/org-forks.svg" alt="siakun-forks" align="left" /></a>
+  <img src="https://raw.githubusercontent.com/siakun/siakun/output/github-metrics.svg" alt="GitHub Metrics" width="420" align="left" />
+  <img src="https://raw.githubusercontent.com/siakun/siakun/output/org-header.svg" alt="🗂️ 다른 공간의 저장소들" /><br/>
+  <a href="https://github.com/siakun-testing"><img src="https://raw.githubusercontent.com/siakun/siakun/output/org-testing.svg" alt="siakun-testing" align="left" /></a>
+  <a href="https://github.com/siakun-archive"><img src="https://raw.githubusercontent.com/siakun/siakun/output/org-archive.svg" alt="siakun-archive" align="left" /></a>
+  <a href="https://github.com/siakun-private"><img src="https://raw.githubusercontent.com/siakun/siakun/output/org-private.svg" alt="siakun-private" align="left" /></a>
+  <a href="https://github.com/siakun-forks"><img src="https://raw.githubusercontent.com/siakun/siakun/output/org-forks.svg" alt="siakun-forks" align="left" /></a>
 </div>
 
 <br clear="both" /><br/>

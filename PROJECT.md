@@ -8,17 +8,30 @@
 |------|------|-----------|
 | `README.md` | 프로필 대문 | 직접 편집 (방문자 대상이라 존댓말 유지) |
 | `AGENTS.md` | 이 저장소의 작업 규칙(트렁크 기반 브랜치 전략, 커밋 절차) | 직접 편집 |
-| `images/github-metrics.svg` | GitHub 활동 요약 이미지 | `lowlighter/metrics`가 CI에서 자동 생성 |
-| `images/org-*.svg` | 조직 섹션 헤더와 조직별 북마크 카드 | `scripts/gen-org-cards.sh`가 CI에서 자동 생성 |
-| `scripts/gen-org-cards.sh` | 조직 카드 생성기 | 직접 편집 |
+| `output` 브랜치의 `github-metrics.svg` | GitHub 활동 요약 이미지 | `lowlighter/metrics`가 CI에서 생성 (`main`에는 없음) |
+| `output` 브랜치의 `org-*.svg` | 조직 섹션 헤더와 조직별 북마크 카드 | `scripts/gen-org-cards.sh`가 CI에서 생성 (`main`에는 없음) |
+| `scripts/gen-org-cards.sh` | 조직 카드 생성기 (`generated/`에 출력) | 직접 편집 |
+| `scripts/publish-generated.sh` | `generated/`를 `output` 브랜치에 발행 | 직접 편집 |
 | `images/tag-*.svg` | 기술 태그 필(노션 태그 스타일) | `scripts/gen-tech-tags.sh`가 로컬에서 생성 |
 | `images/icons/` | 태그 아이콘 원본 캐시(devicon) + 라이선스 고지 | 생성기가 1회 다운로드 후 커밋 |
 | `scripts/gen-tech-tags.sh` | 기술 태그 생성기 + README 마커 동기화 | 직접 편집 |
-| `.github/workflows/metrics.yml` | metrics 자동 생성 워크플로 | 직접 편집 |
-| `.github/workflows/org-cards.yml` | 조직 카드 자동 갱신 워크플로 | 직접 편집 |
+| `.github/workflows/generated-images.yml` | metrics와 조직 카드를 생성해 `output` 브랜치에 발행하는 워크플로 | 직접 편집 |
 | `.gitattributes` | `*.sh` LF 고정 (CRLF 체크아웃 시 bash 깨짐 방지) | 직접 편집 |
+| `.gitignore` | `generated/` 제외 (CI 생성 이미지를 `main`에 커밋하지 않음) | 직접 편집 |
 
-모든 이미지 산출물과 아이콘 원본은 `images/` 폴더에 모은다. 루트에는 문서/설정만 남긴다.
+`main`에 커밋하는 이미지(기술 태그와 아이콘 원본)는 `images/` 폴더에 모은다. 루트에는 문서/설정만 남긴다. CI가 생성하는 이미지는 `main`에 두지 않고 `output` 브랜치에 발행한다(아래 "생성 이미지 발행" 절).
+
+### 생성 이미지 발행 (output 브랜치, generated-images.yml)
+
+CI가 만드는 이미지(`github-metrics.svg`, `org-*.svg`)는 `main`에 커밋하지 않고 `output` 브랜치에 발행한다. README는 `https://raw.githubusercontent.com/siakun/siakun/output/<파일>`로 참조한다.
+
+- **이유**: 생성물을 `main`에 커밋하면 실행마다 봇 커밋이 하나씩 생겨 사람이 한 커밋이 `git log`에 묻히고 로컬 `main`이 원격보다 늘 뒤처진다. 생성물의 중간 상태는 다시 볼 일이 없으므로 히스토리에 남길 이유가 없다.
+- **동작**: 워크플로의 job 하나가 metrics와 조직 카드를 `generated/`에 모으고 `scripts/publish-generated.sh`가 그 폴더를 부모 없는 커밋 하나로 만들어 `output`에 force push한다. 그래서 `output`에는 항상 최신 커밋 하나만 남는다. 내용이 원격과 같으면 발행하지 않는다.
+- **`output`은 작업 브랜치가 아니다.** 발행할 때마다 통째로 교체되므로 체크아웃해 커밋하거나 작업 기반으로 삼지 않는다. 손으로 고친 내용은 다음 발행에서 사라진다.
+- **생성기를 한 job에 모은 이유**: 발행이 브랜치를 통째로 교체하므로, 워크플로를 나눠 같은 브랜치에 따로 발행하면 나중에 발행한 쪽이 앞의 파일을 삭제한다. CI 생성물을 늘릴 때는 이 job에 생성 스텝을 추가해 `generated/`에 출력하게 한다.
+- **참조 검증**: 발행 스크립트는 README에서 `output` 브랜치 URL을 읽어, 참조하는 파일이 `generated/`에 모두 있을 때만 발행한다. 생성 스텝 하나가 빠진 채 발행되어 프로필 이미지가 깨지는 것을 막는 장치다. README에 참조를 추가하려면 그 파일을 만드는 생성 스텝이 먼저 있어야 한다.
+- **`generated/`는 `.gitignore` 대상이다.** 로컬에서 생성기를 실행한 결과는 미리보기용이고 커밋되지 않는다.
+- 이 방법을 고른 근거와 다른 방법(조건부 amend)의 전제는 `docs/ci-auto-commit-history.md`에 있다.
 
 `org-*.svg`는 조직 아바타를 base64로 내장한 SVG로, 조직당 1파일이다. 팔레트는 **테마 중립 단일 팔레트**(미디어 쿼리 없음)다. 글자는 라이트/다크 페이지 배경 양쪽에서 읽히는 중간톤 회색(#7d8590 계열), 조직 이름만 GitHub 블루(#4493f8)로 링크임을 표시하고 카드 배경은 회색 7% 반투명 + 옅은 테두리다. 원래는 `@media (prefers-color-scheme: dark)` 2팔레트였으나 Safari가 `<img>` SVG의 미디어 쿼리를 지원하지 않아 iOS에서 카드마다 무작위 팔레트로 깨졌고(아래 절 함정 2) 2026-07 중립 팔레트로 전환했다. `<img>` 임베드에서는 SVG 내부 링크가 동작하지 않으므로, 카드를 조직당 1파일로 분리하고 README에서 각 `<img>`를 `<a href>`로 감싸 클릭 이동을 구현한다. 카드 하단에 투명 여백 8px를 넣어 세로 스택 시 카드 간격이 생기게 했다.
 
@@ -86,14 +99,12 @@ GitHub README는 CSS를 제거하므로 deprecated `align` 속성 플로트가 �
 
 카드는 **480px 축소 표시가 아니라 396x76 네이티브 설계**다. width 속성 축소는 글자가 뭉개지기 때문이다. 폰트 크기는 그대로 두고 설명은 한 줄로 유지하며 리포 수는 이름 줄 오른쪽 끝(3줄 구성)에 배치해 카드 높이를 낮췄다. 열 높이를 줄여 위 불변식을 지키려는 구성이다.
 
-### 조직 카드 자동 갱신 (org-cards.yml)
+### 조직 카드 자동 갱신 (generated-images.yml)
 
-- `scripts/gen-org-cards.sh`가 `GET /orgs/{org}`에서 공개/비공개 리포 수를 읽어 카드 우하단에 "공개 N / 비공개 M"으로 표시한다.
+- `scripts/gen-org-cards.sh`가 `GET /orgs/{org}`에서 공개/비공개 리포 수를 읽어 카드 우하단에 "공개 N / 비공개 M"으로 표시하고 `generated/org-*.svg`에 출력한다.
 - **비공개 수(`total_private_repos`)는 조직 소유자 권한 토큰으로 호출해야 응답에 포함된다.** CI에서는 `METRICS_TOKEN`을 `GH_TOKEN`으로 넘긴다. 토큰이 없으면 공개 수만 표시하는 fallback이 있다.
-- 스케줄은 매일 00:30 UTC로, metrics(00:00 UTC)와 30분 오프셋을 둬 자동 커밋 push 충돌을 피한다.
-- push 트리거는 `paths`로 생성기/워크플로 파일에 한정한다. 생성물(`images/org-*.svg`)은 paths에 없으므로 자기 커밋으로 재트리거되지 않는다.
-- 로컬 실행: `GH_TOKEN=$(gh auth token) bash scripts/gen-org-cards.sh` (gh CLI 로그인 계정이 조직 소유자면 비공개 수까지 나온다.)
-- 이 워크플로도 metrics처럼 `images/org-*.svg`를 자동 커밋하므로, 로컬과 origin이 발산하는 자동 커밋 소스가 하나 더 늘어난다. push 전 `git pull --rebase` 습관은 동일하게 적용한다.
+- metrics와 같은 job에서 생성되므로 트리거도 같다(2장 참고). 생성기를 고쳐 push하면 그 push가 워크플로를 실행해 새 카드를 발행한다.
+- 로컬 실행: `GH_TOKEN=$(gh auth token) bash scripts/gen-org-cards.sh` (gh CLI 로그인 계정이 조직 소유자면 비공개 수까지 나온다.) 결과는 `generated/`에 생기고 미리보기용이다.
 
 ### 기술 태그 (tag-*.svg, gen-tech-tags.sh)
 
@@ -101,14 +112,14 @@ README 맨 아래(`<br clear="both">` 뒤라 플로트 레이아웃과 간섭 �
 
 - **스크립트의 `tags` 배열이 단일 소스다.** 태그 변경 = 배열 수정 + `bash scripts/gen-tech-tags.sh` 실행으로 끝난다. 스크립트가 `tag-*.svg` 생성, 배열에 없는 스테일 산출물 삭제, README의 `<!-- tech-tags:start/end -->` 마커 구간 재생성까지 한다. README 태그 목록을 손으로 편집하지 않는다.
 - **노출 보류는 배열 항목의 `-` 접두사로 한다.** SVG는 생성/유지하고 README에는 주석 처리된 `<img>`로 나간다. README를 손으로 주석 처리하면 다음 재생성 때 지워지므로 반드시 플래그로 한다.
-- **CI 없음 (수동 실행).** org 카드와 달리 동적 데이터가 없어 재생성 트리거가 "배열 수정"뿐이고 자동 커밋 소스를 늘리지 않기 위해서다.
+- **CI 없음 (수동 실행).** org 카드와 달리 동적 데이터가 없어 재생성 트리거가 "배열 수정"뿐이다. 산출물은 생성기를 고친 사람이 `main`에 함께 커밋한다.
 - **팔레트는 org 카드와 동일한 테마 중립 모노톤.** 글자/아이콘 `#7d8590`, 필 `#8b949e` 7% 채움 + 40% 테두리. 미디어 쿼리를 쓰지 않는 이유는 위 "테마 대응 SVG" 절의 Safari 함정과 같다.
 - **아이콘은 벡터 인라인.** `<img>` 임베드 SVG는 외부 리소스를 못 불러오므로 `images/icons/<slug>.svg` 캐시(1회 다운로드 후 커밋, 소스 핀 고정)에서 내부 요소를 추출해 태그 SVG에 내장한다. paint는 모노톤으로 정규화한다(`none` 보존, 다색/스타일 기반/외부 참조 아이콘은 검증 단계에서 거부).
 - **아이콘 소스는 단색 변형만.** devicon `-plain` 계열(MIT, 고지: `images/icons/LICENSE-devicon.md`). 다색 아이콘을 한 색으로 칠하면 내부 문양이 사라지므로 다색 검출이 거부한다.
 - **태그 간격은 SVG 내장 여백으로 만든다.** 캔버스 우측 2px + README 어절 공백 약 4px = 약 6px, 하단 6px가 줄바꿈 시 세로 간격. 인라인 이미지(align 없음)라 GitHub 패딩 주입이 없고 좁은 폭에서 자연 줄바꿈된다.
 - **마커 구간의 img들은 반드시 `<div>`로 감싼다.** 최상위에 `<img>` 줄을 나열하면 GitHub 렌더러가 줄마다 별도 `<p>` 문단으로 분리해 태그가 세로로 쌓인다(6장 함정 참고). 스크립트가 `<div>` 래핑까지 생성한다.
 
-## 2. metrics 구성 개요 (metrics.yml)
+## 2. metrics 구성 개요 (generated-images.yml)
 
 - **`base: header`만 사용한다.** `activity`, `community`, `repositories` 섹션은 약점 지표(0 PR reviewed, 적은 stars/forks, sponsoring 0 등)를 노출하므로 제외한다. 강점은 아래 플러그인으로 따로 살린다.
 - **plugins**
@@ -116,7 +127,7 @@ README 맨 아래(`<br clear="both">` 뒤라 플로트 레이아웃과 간섭 �
   - `plugin_lines`: 코드 작성량. 구현 중심 역량 시그널.
   - `plugin_languages`: 사용 언어 분포. 직무 적합성(C# 최다)을 보여주는 핵심 자산이다.
 - **트리거**: 매일 00:00 UTC 스케줄, `workflow_dispatch` 수동 실행, main push.
-- **주의**: metrics 액션은 push마다 돌며 `images/github-metrics.svg`를 origin에 자동 커밋한다. 그래서 로컬과 origin이 자주 발산한다. 푸시 전에 `git pull --rebase origin main`으로 원격의 자동 커밋을 먼저 당긴다. 자동 커밋이 쌓이지 않게 하는 방법(전용 브랜치 발행, 조건부 amend)과 각 방법의 전제는 `docs/ci-auto-commit-history.md`에 있다.
+- **출력**: `output_action: none`이라 액션은 커밋하지 않고 러너의 `/metrics_renders/github-metrics.svg`에 파일만 생성한다. 그 파일을 `generated/`로 옮겨 발행하는 과정은 1장 "생성 이미지 발행" 절에 있다. 이 옵션을 기본값(`commit`)으로 되돌리면 실행마다 `main`에 봇 커밋이 생긴다.
 
 ## 3. lowlighter/metrics 저장소 필터링 메커니즘
 
