@@ -1,6 +1,6 @@
 > “Everybody in this country should learn how to program a computer, because it teaches you how to think.”<br> - Steve Jobs, *The Lost Interview* (1995)
 
-저에게 개발은 남은 평생 이어가고 싶은 일입니다.<br>설계에서 재미를, 구현에서 자신감을, 누군가에게 도움이 될 때 보람을 느낍니다.<br>그 과정에서 쌓은 경험을 GitHub에서 함께 나누고 싶습니다.
+저에게 개발은 남은 평생 이어가고 싶은 일입니다.<br>설계에서 재미를, 구현에서 자신감을, 누군가에게 도움이 될 때 보람을 느낍니다.<br>저의 즐거움을 GitHub에서 함께 나누고 싶습니다.
 
 <!-- 2단 레이아웃: metrics와 카드 4장은 왼쪽 플로트, 헤더는 일반 인라인 + <br/>.
      와이드: 헤더/카드가 metrics 오른쪽 열에 쌓임. 중간 폭: 헤더가 자기 행을 차지하고
